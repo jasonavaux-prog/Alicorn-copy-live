@@ -1,87 +1,68 @@
-First look for a file with name: Current how to as of ___ (date)
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
+app = Flask(__name__)
+#is an HTTP-header based mechanism that allows a server to indicate any origins 
+#https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+#simple version: CORS allows use of fetch(), it gives permission for the browser to accept the data from another origin
+CORS(app)
 
-
-# Flask Official Docs/ Flask Quickstart documentation
-#    https://flask.palletsprojects.com/
-# ctrl F or scroll down to find all information below
-
-
-
-#######################################################################
-This part covers the build for app.py and requirements.txt 
-
-what i did to set up aka refernce page.....
-
-##                ##
-##   ~ app.py ~   ##
-##                ##
-
-#Example from docs:
+#route() decorator to tell Flask what URL should trigger our function. (source flask quickstart)
 @app.route("/")
-def hello_world():
-    return "Hello, World!"
+def home():
+    return "ALICORN backend is running"
 
-#Handling JSON request for GPS route
-request.get_json()
-
-#jsonify returning data
-return jsonify({...})
-
-
-Trying to build:
-GET /                  is server turned on
-GET /bus-location      send GPS data
-GET /attendance        send student data
-POST /gps              receive data from frontend
-
-USED AI TO CREATE DATA FILL IN FOR DEMO
-
-##                        ##
-##  ~ requirements.txt ~  ##
-##                        ##
+"""\
+CREATED 4/18/2026
+@app.route("/bus-location", methods=["GET"])
+@app.route("/attendance", methods=["GET"])
+@app.route("/students", methods=["GET"])
+@app.route("/gps", methods=["POST"])
 
 
-# same site (flask.palletsprojects.com)
-#############################################################################
+Update 4/20/2026
+"""
 
 
+# app.jsx will "fetch" request the URL in app.py  (current just use your comp as localhost in example)  EXAMPLE: fetch("http://localhost:5000/bus-location")      
+# that fetch hits backend, /bus-location as shown below
 
-Source cited: pip documentation and Python Docs
-(think pip might mean "package installer for python")
-     - used to install, manage, and uninstall software libraries from the Python Package Index
+#App.jsx sends a fetch request to the Flask backend URL (/bus-location).
+#This request is handled by app.py using a route.
+#The route returns JSON data back to the frontend.
 
-##                                  ##
-##  ~ Alicorn Backend Demo Setup ~  ##
-##                                  ##
+@app.route("/bus-location", methods=["GET"])
+def bus_location():
+# sends JSON back to front end
+    return jsonify({
+        "busId": "12",
+        "latitude": 38.8816,
+        "longitude": -77.0910,
+        "status": "On Route"
+    })
 
+@app.route("/attendance", methods=["GET"])
+def attendance():
+    return jsonify([
+        {"studentId": "1001", "name": "Jordan Lee", "status": "On Bus"},
+        {"studentId": "1002", "name": "Taylor Smith", "status": "Absent"}
+    ])
 
+@app.route("/students", methods=["GET"])
+def students():
+    return jsonify([
+        {"studentId": "1001", "name": "Jordan Lee", "route": "Route A"},
+        {"studentId": "1002", "name": "Taylor Smith", "route": "Route B"}
+    ])
 
-1. Download or clone repo
-2. Open terminal in folder
-    - go to app.y folder, click file path, type cmd
+@app.route("/gps", methods=["POST"])
+def gps():
+    data = request.get_json()
+    print("GPS DATA:", data)
+    return jsonify({
+        "status": "received",
+        "data": data
+    })
 
-## Install dependencies
-  - in command promt type
-        pip install -r requirements.txt
-              >that is the requirements.txt that you built in gethub
-
-## Run server
-still in command prompt type:
-python app.py
-
-## Open in browser for testing
-http://127.0.0.1:5000/
-http://127.0.0.1:5000/bus-location
-http://127.0.0.1:5000/attendance
-http://127.0.0.1:5000/students
-
-this makes:
-your computer the server
-flask backend running on it
-browser - client connecting to it
-
-
-##################################################################################################################
-
-
+if __name__ == "__main__":
+    app.run(debug=True)
